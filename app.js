@@ -8,11 +8,11 @@
 // Game Values
 let min = 1,
     max = 10,
-    winningNum = 2,
+    winningNum = getRandomNum(min, max),
     guessesLeft = 3
 
 // UI elements
-const game = document.getElementById('game'),
+const game = document.querySelector('.game'),
     minNum = document.querySelector('.min-num'),
     maxNum = document.querySelector('.max-num'),
     guessInput = document.getElementById('guess-input'),
@@ -23,23 +23,31 @@ const game = document.getElementById('game'),
 minNum.textContent = min
 maxNum.textContent = max
 
+// Play again event listner
+game.addEventListener('mousedown', function (e) {
+    if (e.target.className === 'play-again') {
+        window.location.reload()
+    }
+})
+
 // Listen for guess
 guessBtn.addEventListener('click', function () {
     let guess = parseInt(guessInput.value);
 
-    if (isNaN(guess) || guess < min || guess > max) {
-        setMessage(`Please enter a number between ${min} and ${max}`, 'red')
-    }
+
 
     if (guess === winningNum) {
         // Game won
         gameOver(true, `${winningNum} is correct! You win!`)
+    } else if (isNaN(guess) || guess < min || guess > max) {
+        setMessage(`Please enter a number between ${min} and ${max}`, 'red')
     } else {
         guessesLeft -= 1
 
         if (guessesLeft === 0) {
             // Game over - lost
             gameOver(false, `Game Over, you lost. The correct number was ${winningNum}`)
+            guessInput.value = ''
         } else {
             // Game continues - answer wrong
             guessInput.value = ''
@@ -53,13 +61,21 @@ guessBtn.addEventListener('click', function () {
 function gameOver(won, message) {
     let color
     won === true ? color = 'green' : color = 'red'
-    guessBtn.disabled = true
     guessInput.style.borderColor = color
     guessBtn.style.borderColor = color
     setMessage(message, color)
+
+    // Play Again
+    guessBtn.value = 'Play Again'
+    guessBtn.className += 'play-again'
 }
 
 function setMessage(msg, color) {
     message.style.color = color
     message.textContent = msg
+}
+
+function getRandomNum(min, max) {
+    let number = Math.floor(Math.random() * (max - min + 1) + min)
+    return number
 }
